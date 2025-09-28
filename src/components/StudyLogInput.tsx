@@ -4,26 +4,37 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Send, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useDashboard } from "@/hooks/useDashboard";
+import { useAuth } from "@/hooks/useAuth";
 
 export const StudyLogInput = () => {
   const [logText, setLogText] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+  const { processStudyLog } = useDashboard();
+  const { user } = useAuth();
 
   const handleSubmit = async () => {
-    if (!logText.trim()) return;
+    if (!logText.trim() || !user) return;
     
     setIsProcessing(true);
     
-    // Simulate AI processing
-    setTimeout(() => {
+    try {
+      await processStudyLog(logText);
       toast({
         title: "Study log processed!",
         description: "Your study session has been analyzed and added to your progress.",
       });
       setLogText("");
+    } catch (error) {
+      toast({
+        title: "Error processing study log",
+        description: error instanceof Error ? error.message : "Please try again.",
+        variant: "destructive"
+      });
+    } finally {
       setIsProcessing(false);
-    }, 2000);
+    }
   };
 
   return (
