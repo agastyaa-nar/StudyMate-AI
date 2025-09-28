@@ -100,7 +100,7 @@ export const LoginForm = () => {
           <div className="mx-auto p-3 bg-gradient-primary rounded-xl w-fit mb-4">
             <GraduationCap className="h-8 w-8 text-white" />
           </div>
-          <CardTitle className="text-2xl font-bold">AI Study Tracker</CardTitle>
+          <CardTitle className="text-2xl font-bold">AI Study Tracker by Narr</CardTitle>
           <CardDescription>Intelligent learning analytics for students</CardDescription>
         </CardHeader>
         
