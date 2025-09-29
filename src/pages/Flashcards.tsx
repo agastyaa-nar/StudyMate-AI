@@ -309,10 +309,6 @@ const Flashcards = () => {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <Header 
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-        todayProgress={{ hours: 4.2, target: 6.0 }}
-      />
 
       <main className="container mx-auto px-4 py-6 space-y-8">
         <div className="flex items-center justify-between">

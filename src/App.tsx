@@ -6,18 +6,30 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { LoginForm } from "@/components/auth/LoginForm";
+import ModernNavbar from "@/components/layout/ModernNavbar";
+import MainSidebar from "@/components/layout/MainSidebar";
+import { Sidebar } from "@/components/layout/Sidebar";
+import FloatingActionButton from "@/components/layout/FloatingActionButton";
+import KeyboardShortcuts from "@/components/layout/KeyboardShortcuts";
 import Dashboard from "./pages/Dashboard";
 import StudyPlanner from "./pages/StudyPlanner";
 import Analytics from "./pages/Analytics";
 import Achievements from "./pages/Achievements";
 import StudyJournal from "./pages/StudyJournal";
 import Flashcards from "./pages/Flashcards";
+import StudyGroups from "./pages/StudyGroups";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import About from "./pages/About";
 import NotFound from "./pages/NotFound";
+import { useState } from "react";
 
 const queryClient = new QueryClient();
 
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
+  const [isMainSidebarOpen, setIsMainSidebarOpen] = useState(false);
+  const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
 
   if (loading) {
     return (
@@ -34,7 +46,29 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     return <LoginForm />;
   }
 
-  return <>{children}</>;
+  return (
+    <div className="min-h-screen bg-background">
+      <KeyboardShortcuts />
+      <ModernNavbar 
+        onToggleMainSidebar={() => setIsMainSidebarOpen(!isMainSidebarOpen)}
+        onToggleAISidebar={() => setIsAISidebarOpen(!isAISidebarOpen)}   // ✅ tambahkan ini
+        todayProgress={{ hours: 4.2, target: 6.0 }}
+      />
+      <MainSidebar 
+        isOpen={isMainSidebarOpen} 
+        onClose={() => setIsMainSidebarOpen(false)}
+        todayProgress={{ hours: 4.2, target: 6.0 }}
+      />
+      <main className="container mx-auto px-4 py-6">
+        {children}
+      </main>
+      <Sidebar 
+        isOpen={isAISidebarOpen} 
+        onClose={() => setIsAISidebarOpen(false)} 
+      />
+      <FloatingActionButton />
+    </div>
+  );
 };
 
 const App = () => (
@@ -52,6 +86,10 @@ const App = () => (
               <Route path="/achievements" element={<Achievements />} />
               <Route path="/journal" element={<StudyJournal />} />
               <Route path="/flashcards" element={<Flashcards />} />
+              <Route path="/groups" element={<StudyGroups />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/about" element={<About />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

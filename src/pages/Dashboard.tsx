@@ -1,17 +1,13 @@
-import { useState } from 'react';
 import { StudyLogInput } from "@/components/StudyLogInput";
 import { SubjectProgress } from "@/components/SubjectProgress";
 import { StudyHoursChart } from "@/components/StudyHoursChart";
 import { StudyCalendar } from "@/components/StudyCalendar";
 import { AIInsights } from "@/components/AIInsights";
-import { Header } from "@/components/layout/Header";
-import { Sidebar } from "@/components/layout/Sidebar";
 import { Card } from "@/components/ui/card";
 import { BookOpen, BarChart3, Calendar, Target, Brain } from "lucide-react";
 import { useDashboard } from "@/hooks/useDashboard";
 
 const Dashboard = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { data, loading } = useDashboard();
 
   const stats = data?.stats || {
@@ -24,14 +20,7 @@ const Dashboard = () => {
   const goalAchievement = Math.round((stats.total_hours_this_week / 40) * 100);
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
-      <Header 
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-        todayProgress={{ hours: 4.2, target: 6.0 }}
-      />
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-6 space-y-8">
+    <div className="space-y-8">
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="p-4 shadow-card">
@@ -114,12 +103,6 @@ const Dashboard = () => {
             <AIInsights />
           </section>
         </div>
-      </main>
-
-      <Sidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-      />
     </div>
   );
 };
