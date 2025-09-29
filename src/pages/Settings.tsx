@@ -293,16 +293,16 @@ const Settings = () => {
                       {key === 'weeklyReports' && 'Receive weekly progress reports'}
                     </p>
                   </div>
-                  <Switch
-                    checked={value}
-                    onCheckedChange={(checked) => 
-                      setPreferences(prev => ({
-                        ...prev,
-                        notifications: { ...prev.notifications, [key]: checked }
-                      }))
-                    }
-                  />
-                </div>
+                    <Switch
+                      checked={value}
+                      onCheckedChange={(checked) => 
+                        setPreferences(prev => ({
+                          ...prev,
+                          notifications: { ...prev.notifications, [key]: checked }
+                        }))
+                      }
+                    />
+                  </div>
               ))}
             </CardContent>
           </Card>

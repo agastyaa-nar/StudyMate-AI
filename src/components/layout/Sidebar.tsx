@@ -5,6 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   MessageCircle, 
   Send, 
@@ -13,7 +14,6 @@ import {
   Lightbulb,
   BookOpen,
   TrendingUp,
-  Calendar,
   X
 } from 'lucide-react';
 
@@ -31,6 +31,7 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+  const isMobile = useIsMobile();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -129,10 +130,24 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen && !isMobile) return null;
 
   return (
-    <div className="fixed inset-y-0 right-0 w-96 bg-background border-l shadow-lg z-50 flex flex-col">
+    <>
+      {/* Backdrop for mobile */}
+      {isMobile && isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden" 
+          onClick={onClose}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <div className={`fixed inset-y-0 right-0 bg-background border-l shadow-lg z-50 flex flex-col transition-transform duration-300 ease-in-out ${
+        isMobile 
+          ? `w-full sm:w-96 transform ${isOpen ? 'translate-x-0' : 'translate-x-full'}`
+          : 'w-96'
+      }`}>
       {/* Header */}
       <div className="p-4 border-b bg-card">
         <div className="flex items-center justify-between">
@@ -145,7 +160,12 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
               <p className="text-xs text-muted-foreground">Powered by IBM Granite</p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onClose}
+            className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -235,6 +255,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           AI responses are simulated. Press Enter to send.
         </p>
       </div>
-    </div>
+      </div>
+    </>
   );
 };

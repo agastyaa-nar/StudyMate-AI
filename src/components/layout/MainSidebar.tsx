@@ -156,11 +156,12 @@ const MainSidebar = ({ isOpen, onClose, todayProgress = { hours: 4.2, target: 6.
                 <p className="text-xs text-muted-foreground">Navigation</p>
               </div>
             </div>
+            {/* FIXED: Removed lg:hidden to show button on all screen sizes */}
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={onClose}
-              className="h-8 w-8 p-0 lg:hidden"
+              className="h-8 w-8 p-0"
             >
               <X className="h-4 w-4" />
             </Button>

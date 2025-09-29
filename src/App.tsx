@@ -51,7 +51,8 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
       <KeyboardShortcuts />
       <ModernNavbar 
         onToggleMainSidebar={() => setIsMainSidebarOpen(!isMainSidebarOpen)}
-        onToggleAISidebar={() => setIsAISidebarOpen(!isAISidebarOpen)}   // ✅ tambahkan ini
+        isSidebarOpen={isMainSidebarOpen}
+        onToggleAISidebar={() => setIsAISidebarOpen(!isAISidebarOpen)}  
         todayProgress={{ hours: 4.2, target: 6.0 }}
       />
       <MainSidebar 

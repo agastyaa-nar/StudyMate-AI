@@ -54,8 +54,9 @@ import { useNotifications } from '@/hooks/useNotifications';
 import NotificationBell from './NotificationBell';
 
 interface ModernNavbarProps {
-  onToggleMainSidebar?: () => void; 
-  onToggleAISidebar?: () => void;   
+  onToggleMainSidebar: () => void;
+  isSidebarOpen: boolean;
+  onToggleAISidebar?: () => void;
   todayProgress?: {
     hours: number;
     target: number;
@@ -65,6 +66,7 @@ interface ModernNavbarProps {
 const ModernNavbar = ({ 
   onToggleMainSidebar, 
   onToggleAISidebar,
+  isSidebarOpen,
   todayProgress = { hours: 4.2, target: 6.0 } 
 }: ModernNavbarProps) => {
   const location = useLocation();
@@ -114,31 +116,34 @@ const ModernNavbar = ({
     }`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Main Sidebar Toggle */}
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onToggleMainSidebar}
-            className="flex items-center gap-2"
-          >
-            <Menu className="h-4 w-4" />
-            <span className="hidden sm:inline">Menu</span>
-          </Button>
-
-          {/* Logo and Brand */}
+          {/* Left: Hamburger + Logo */}
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl shadow-lg">
-              <GraduationCap className="h-6 w-6 text-white" />
-            </div>
-            <div className="hidden sm:block">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                StudyMate AI
-              </h1>
-              <p className="text-xs text-muted-foreground">Intelligent Learning Platform</p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={onToggleMainSidebar}
+              className="flex items-center gap-2"
+            >
+              {isSidebarOpen ? (
+                <X className="h-4 w-4" />
+              ) : (
+                <Menu className="h-4 w-4" />
+              )}
+              <span className="hidden sm:inline">Menu</span>
+            </Button>
+
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl shadow-lg">
+                <GraduationCap className="h-6 w-6 text-white" />
+              </div>
+              <div className="hidden sm:block">
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  StudyMate AI
+                </h1>
+                <p className="text-xs text-muted-foreground">Intelligent Learning Platform</p>
+              </div>
             </div>
           </div>
-
-          
 
           {/* Search and Actions */}
           <div className="flex items-center gap-3">
