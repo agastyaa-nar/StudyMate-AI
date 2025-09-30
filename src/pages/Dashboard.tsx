@@ -7,30 +7,35 @@ import { AIInsights } from "@/components/AIInsights";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Card } from "@/components/ui/card";
-import { BookOpen, BarChart3, Calendar, Target, Brain } from "lucide-react";
+import { BookOpen, BarChart3, Calendar, Target, Brain, Loader2 } from "lucide-react";
 import { useDashboard } from "@/hooks/useDashboard";
+import { useAuth } from "@/hooks/useAuth";
 
 const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { data, loading } = useDashboard();
+  const { user } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   const stats = data?.stats || {
-    total_hours_this_week: 35.2,
-    active_subjects: 4,
-    upcoming_deadlines: 3,
+    total_hours_this_week: 0,
+    active_subjects: 0,
+    upcoming_deadlines: 0,
+    current_streak: 0,
   };
 
-  // Calculate goal achievement (example calculation)
   const goalAchievement = Math.round((stats.total_hours_this_week / 40) * 100);
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <Header 
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-        todayProgress={{ hours: 4.2, target: 6.0 }}
-      />
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-6 space-y-8">
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -48,7 +53,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-3">
               <BarChart3 className="h-8 w-8 text-secondary" />
               <div>
-                <p className="text-2xl font-bold">{stats.total_hours_this_week}h</p>
+                <p className="text-2xl font-bold">{stats.total_hours_this_week.toFixed(1)}h</p>
                 <p className="text-sm text-muted-foreground">This Week</p>
               </div>
             </div>
@@ -68,7 +73,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-3">
               <Brain className="h-8 w-8 text-success" />
               <div>
-                <p className="text-2xl font-bold">12</p>
+                <p className="text-2xl font-bold">{stats.current_streak}</p>
                 <p className="text-sm text-muted-foreground">Study Streak</p>
               </div>
             </div>

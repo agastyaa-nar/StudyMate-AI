@@ -1,81 +1,56 @@
+// src/hooks/useDashboard.ts
 import { useState, useEffect } from 'react';
-import { db } from '@/lib/supabase';
+import { studyLogService, subjectService, streakService } from '@/services/api';
 import { useAuth } from './useAuth';
 
-interface DashboardData {
-  subjects: Array<{
-    id: string;
-    name: string;
-    color: string;
-    target_hours_per_week: number;
-    weekly_hours: number;
-    progress: number;
-  }>;
-  studyHoursData: Array<{
-    date: string;
-    hours: number;
-  }>;
-  calendarEvents: Array<{
-    id: string;
-    title: string;
-    date: string;
-    type: string;
-    priority: string;
-    status: string;
-    subject: string;
-    color: string;
-  }>;
-  insights: Array<any>;
-  stats: {
-    total_hours_this_week: number;
-    total_hours_this_month: number;
-    active_subjects: number;
-    upcoming_deadlines: number;
-  };
-}
-
-export const useDashboard = () => {
+export function useDashboard() {
   const { user } = useAuth();
-  const [data, setData] = useState<DashboardData | null>(null);
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchDashboardData = async () => {
-    if (!user) return;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      const result = await db.getDashboardData();
-      setData(result.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data');
-      console.error('Dashboard data error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    if (!user) return;
+
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch all data in parallel
+        const [weeklyStats, subjects, streaks] = await Promise.all([
+          studyLogService.getWeeklyStats(user.id),
+          subjectService.getSubjects(user.id),
+          streakService.getStreaks(user.id),
+        ]);
+
+        // Calculate stats
+        const totalHoursThisWeek = weeklyStats.reduce((sum, log) => sum + parseFloat(log.hours.toString()), 0);
+        const activeSubjects = subjects.length;
+        
+        // Get current streak
+        const dailyStreak = streaks.find(s => s.streak_type === 'daily');
+
+        setData({
+          stats: {
+            total_hours_this_week: totalHoursThisWeek,
+            active_subjects: activeSubjects,
+            upcoming_deadlines: 3, // This would come from goals table
+            current_streak: dailyStreak?.current_streak || 0,
+          },
+          weeklyStats,
+          subjects,
+          streaks,
+        });
+        setError(null);
+      } catch (err) {
+        setError(err as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchDashboardData();
   }, [user]);
 
-  const processStudyLog = async (rawText: string) => {
-    try {
-      const result = await db.processStudyLog(rawText);
-      // Refresh dashboard data after processing
-      await fetchDashboardData();
-      return result;
-    } catch (err) {
-      throw err;
-    }
-  };
-
-  return {
-    data,
-    loading,
-    error,
-    refetch: fetchDashboardData,
-    processStudyLog,
-  };
-};
+  return { data, loading, error };
+}

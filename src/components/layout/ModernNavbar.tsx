@@ -132,7 +132,7 @@ const ModernNavbar = ({
               <span className="hidden sm:inline">Menu</span>
             </Button>
 
-            <div className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition">
               <div className="p-2 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl shadow-lg">
                 <GraduationCap className="h-6 w-6 text-white" />
               </div>
@@ -142,7 +142,7 @@ const ModernNavbar = ({
                 </h1>
                 <p className="text-xs text-muted-foreground">Intelligent Learning Platform</p>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Search and Actions */}

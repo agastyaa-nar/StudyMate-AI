@@ -1,10 +1,11 @@
+// src/App.tsx
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import { useAuth } from "@/hooks/useAuth";
+import { AuthProvider } from "@/hooks/useAuth";   // ⬅️ tambahin ini
 import { LoginForm } from "@/components/auth/LoginForm";
 import ModernNavbar from "@/components/layout/ModernNavbar";
 import MainSidebar from "@/components/layout/MainSidebar";
@@ -23,6 +24,7 @@ import Settings from "./pages/Settings";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
 
@@ -78,24 +80,26 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <AuthWrapper>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/planner" element={<StudyPlanner />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/achievements" element={<Achievements />} />
-              <Route path="/journal" element={<StudyJournal />} />
-              <Route path="/flashcards" element={<Flashcards />} />
-              <Route path="/groups" element={<StudyGroups />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/about" element={<About />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AuthWrapper>
-        </BrowserRouter>
+        <AuthProvider> {/* ⬅️ Bungkus di sini */}
+          <BrowserRouter>
+            <AuthWrapper>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/planner" element={<StudyPlanner />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/achievements" element={<Achievements />} />
+                <Route path="/journal" element={<StudyJournal />} />
+                <Route path="/flashcards" element={<Flashcards />} />
+                <Route path="/groups" element={<StudyGroups />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/about" element={<About />} />
+                {/* catch-all */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AuthWrapper>
+          </BrowserRouter>
+        </AuthProvider>
       </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>
