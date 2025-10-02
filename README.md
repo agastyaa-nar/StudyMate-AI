@@ -2,7 +2,6 @@
 
 > Platform pelacakan belajar cerdas dengan AI untuk membantu mahasiswa dan pelajar mengoptimalkan performa akademik mereka.
 
-[![Lovable](https://img.shields.io/badge/Built%20with-Lovable-ff69b4)](https://lovable.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
@@ -24,8 +23,6 @@
 ## 🎯 Tentang Proyek
 
 AI Study Tracker adalah aplikasi web full-stack yang dirancang untuk membantu pelajar dan mahasiswa melacak, menganalisis, dan mengoptimalkan kebiasaan belajar mereka. Aplikasi ini menggunakan kecerdasan buatan untuk memberikan insight personal dan rekomendasi belajar yang disesuaikan.
-
-**URL Proyek**: https://lovable.dev/projects/22548a24-5da9-4bff-afdf-71afbb99ae82
 
 ### Masalah yang Dipecahkan
 
