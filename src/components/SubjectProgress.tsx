@@ -1,9 +1,10 @@
-// src/components/SubjectProgress.tsx - Updated with Supabase
+// src/components/SubjectProgress.tsx - Simplified and Functional
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { useSubjects } from '@/hooks/useSubjects';
-import { Plus, Trash2, Edit, Loader2 } from 'lucide-react';
+import { useStudyLogs } from '@/hooks/useStudyLogs';
+import { Plus, Loader2, BookOpen } from 'lucide-react';
 import { useState } from 'react';
 import {
   Dialog,
@@ -16,20 +17,27 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
 export function SubjectProgress() {
-  const { subjects, createSubject, updateSubject, deleteSubject, loading } = useSubjects();
+  const { subjects, createSubject, loading } = useSubjects();
+  const { logs } = useStudyLogs();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     color: '#3b82f6',
-    target_hours: '',
   });
 
+  // Calculate total hours per subject from study logs
+  const getSubjectHours = (subjectId: string) => {
+    return logs
+      .filter(log => log.subject_id === subjectId)
+      .reduce((total, log) => total + (log.hours || 0), 0);
+  };
+
   const handleCreateSubject = async () => {
-    if (!formData.name || !formData.target_hours) {
+    if (!formData.name.trim()) {
       toast({
-        title: 'Missing information',
-        description: 'Please fill in all fields.',
+        title: 'Subject Name Required',
+        description: 'Please enter a subject name.',
         variant: 'destructive',
       });
       return;
@@ -37,40 +45,21 @@ export function SubjectProgress() {
 
     try {
       await createSubject({
-        name: formData.name,
+        name: formData.name.trim(),
         color: formData.color,
-        target_hours: parseFloat(formData.target_hours),
       });
 
       toast({
-        title: 'Subject created! 📖',
+        title: 'Subject Added! 📚',
         description: `${formData.name} has been added to your subjects.`,
       });
 
-      setFormData({ name: '', color: '#3b82f6', target_hours: '' });
+      setFormData({ name: '', color: '#3b82f6' });
       setIsDialogOpen(false);
     } catch (error: any) {
       toast({
-        title: 'Failed to create subject',
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleDeleteSubject = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete ${name}?`)) return;
-
-    try {
-      await deleteSubject(id);
-      toast({
-        title: 'Subject deleted',
-        description: `${name} has been removed.`,
-      });
-    } catch (error: any) {
-      toast({
-        title: 'Failed to delete subject',
-        description: error.message,
+        title: 'Failed to Add Subject',
+        description: 'Please try again. If the problem persists, contact support.',
         variant: 'destructive',
       });
     }
@@ -78,18 +67,16 @@ export function SubjectProgress() {
 
   if (loading) {
     return (
-      <Card className="shadow-card">
-        <CardContent className="p-6 flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </CardContent>
-      </Card>
+      <div className="flex justify-center py-8">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
     );
   }
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Your Subjects</h3>
+        <h3 className="text-lg font-semibold text-gray-900">Your Subjects</h3>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="gap-2">
@@ -103,34 +90,32 @@ export function SubjectProgress() {
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Subject Name</label>
+                <label className="text-sm font-medium text-gray-700">Subject Name</label>
                 <Input
-                  placeholder="e.g., Mathematics"
+                  placeholder="e.g., Mathematics, Physics, Chemistry"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Color</label>
-                <Input
-                  type="color"
-                  value={formData.color}
-                  onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Target Hours</label>
-                <Input
-                  type="number"
-                  step="0.5"
-                  min="0"
-                  placeholder="20"
-                  value={formData.target_hours}
-                  onChange={(e) => setFormData(prev => ({ ...prev, target_hours: e.target.value }))}
-                />
+                <label className="text-sm font-medium text-gray-700">Color</label>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="color"
+                    value={formData.color}
+                    onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
+                    className="w-16 h-10 p-1 border rounded"
+                  />
+                  <div 
+                    className="w-8 h-8 rounded-full border-2 border-gray-200"
+                    style={{ backgroundColor: formData.color }}
+                  />
+                </div>
               </div>
               <Button onClick={handleCreateSubject} className="w-full">
-                Create Subject
+                <Plus className="mr-2 h-4 w-4" />
+                Add Subject
               </Button>
             </div>
           </DialogContent>
@@ -138,53 +123,53 @@ export function SubjectProgress() {
       </div>
 
       {subjects.length === 0 ? (
-        <Card className="shadow-card">
-          <CardContent className="p-6 text-center">
-            <p className="text-muted-foreground">No subjects yet. Add your first subject to get started!</p>
-          </CardContent>
-        </Card>
+        <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+          <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Subjects Yet</h3>
+          <p className="text-gray-600 mb-4">Add your first subject to start tracking your study progress.</p>
+          <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add Your First Subject
+          </Button>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-3">
           {subjects.map((subject) => {
-            const progress = subject.target_hours > 0 
-              ? (subject.completed_hours / subject.target_hours) * 100 
-              : 0;
+            const totalHours = getSubjectHours(subject.id);
+            const weeklyTarget = 10; // Default weekly target
+            const progress = (totalHours / weeklyTarget) * 100;
 
             return (
-              <Card key={subject.id} className="shadow-card">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: subject.color }}
-                      />
-                      <CardTitle className="text-lg">{subject.name}</CardTitle>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteSubject(subject.id, subject.name)}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+              <div key={subject.id} className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: subject.color }}
+                    />
+                    <h4 className="font-medium text-gray-900">{subject.name}</h4>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Progress</span>
-                      <span className="font-medium">
-                        {subject.completed_hours.toFixed(1)}h / {subject.target_hours}h
-                      </span>
-                    </div>
-                    <Progress value={Math.min(progress, 100)} className="h-2" />
-                    <p className="text-xs text-muted-foreground text-right">
-                      {progress.toFixed(0)}% Complete
-                    </p>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-blue-600">{totalHours.toFixed(1)}h</p>
+                    <p className="text-xs text-gray-500">Total Study Time</p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Weekly Progress</span>
+                    <span>{Math.min(progress, 100).toFixed(0)}%</span>
+                  </div>
+                  <Progress 
+                    value={Math.min(progress, 100)} 
+                    className="h-2"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>{totalHours.toFixed(1)}h studied</span>
+                    <span>{weeklyTarget}h weekly target</span>
+                  </div>
+                </div>
+              </div>
             );
           })}
         </div>
